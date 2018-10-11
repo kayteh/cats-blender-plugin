@@ -6,24 +6,24 @@ from bpy_extras.io_utils import ImportHelper
 from mathutils import Euler
 import importlib
 
-if "io_scene_gltf" not in locals():
-    import io_scene_gltf.animation
-    import io_scene_gltf.buffer
-    import io_scene_gltf.camera
-    import io_scene_gltf.material
-    import io_scene_gltf.mesh
-    import io_scene_gltf.scene
-    import io_scene_gltf.node_groups
-    import io_scene_gltf.light
+if "gltf_local" not in locals():
+    import gltf_local.animation
+    import gltf_local.buffer
+    import gltf_local.camera
+    import gltf_local.material
+    import gltf_local.mesh
+    import gltf_local.scene
+    import gltf_local.node_groups
+    import gltf_local.light
 else:
-    importlib.reload(io_scene_gltf.animation)
-    importlib.reload(io_scene_gltf.buffer)
-    importlib.reload(io_scene_gltf.camera)
-    importlib.reload(io_scene_gltf.material)
-    importlib.reload(io_scene_gltf.mesh)
-    importlib.reload(io_scene_gltf.scene)
-    importlib.reload(io_scene_gltf.node_groups)
-    importlib.reload(io_scene_gltf.light)
+    importlib.reload(gltf_local.animation)
+    importlib.reload(gltf_local.buffer)
+    importlib.reload(gltf_local.camera)
+    importlib.reload(gltf_local.material)
+    importlib.reload(gltf_local.mesh)
+    importlib.reload(gltf_local.scene)
+    importlib.reload(gltf_local.node_groups)
+    importlib.reload(gltf_local.light)
 
 bl_info = {
     'name': 'glTF 2.0 Importer',
@@ -293,15 +293,15 @@ class ImportGLTF(bpy.types.Operator, ImportHelper):
 
 
 CREATE_FNS = {
-    'buffer': io_scene_gltf.buffer.create_buffer,
-    'buffer_view': io_scene_gltf.buffer.create_buffer_view,
-    'accessor': io_scene_gltf.buffer.create_accessor,
-    'image': io_scene_gltf.material.create_image,
-    'material': io_scene_gltf.material.create_material,
-    'node_group': io_scene_gltf.node_groups.create_group,
-    'mesh': io_scene_gltf.mesh.create_mesh,
-    'camera': io_scene_gltf.camera.create_camera,
-    'light': io_scene_gltf.light.create_light,
+    'buffer': gltf_local.buffer.create_buffer,
+    'buffer_view': gltf_local.buffer.create_buffer_view,
+    'accessor': gltf_local.buffer.create_accessor,
+    'image': gltf_local.material.create_image,
+    'material': gltf_local.material.create_material,
+    'node_group': gltf_local.node_groups.create_group,
+    'mesh': gltf_local.mesh.create_mesh,
+    'camera': gltf_local.camera.create_camera,
+    'light': gltf_local.light.create_light,
 }
 
 # Add to a menu
