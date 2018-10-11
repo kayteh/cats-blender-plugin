@@ -46,6 +46,7 @@ if "tools" not in locals():
     print('STARTUP!!')
     from . import addon_updater_ops
     import mmd_tools_local
+    import gltf_local
     import tools.armature
     import tools.armature_bones
     import tools.armature_manual
@@ -68,6 +69,7 @@ if "tools" not in locals():
 else:
     print('RELOAD!!')
     importlib.reload(mmd_tools_local)
+    importlib.reload(gltf_local)
     importlib.reload(addon_updater_ops)
     importlib.reload(tools.armature)
     importlib.reload(tools.armature_bones)
