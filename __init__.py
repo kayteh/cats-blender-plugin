@@ -235,6 +235,7 @@ class ToolPanel:
             ("XPS", "XNALara", 'Import .xps/.mesh/.ascii files'),
             ("SOURCE", "Source", 'Import .smd/.qc/.vta/.dmx files'),
             ("FBX", "FBX", 'Import .fbx files'),
+            ("VRM", "VRM", 'Import .vrm/.glb/gltm files')
         ],
         default='MMD'
     )
@@ -1866,6 +1867,7 @@ classesToRegister = [
     tools.importer.ImportXPS,
     tools.importer.ImportSource,
     tools.importer.ImportFBX,
+    tools.importer.ImportVRM,
 
     tools.importer.EnableMMD,
     tools.importer.InstallXPS,

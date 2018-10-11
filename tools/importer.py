@@ -78,6 +78,12 @@ class ImportModel(bpy.types.Operator):
             except (TypeError, ValueError):
                 bpy.ops.import_scene.fbx('INVOKE_DEFAULT')
 
+        elif context.scene.import_mode == 'VRM':
+            try:
+                bpy.ops.import_scene.gltf('INVOKE_DEFAULT')
+            except:
+                print("big oops")
+
         return {'FINISHED'}
 
 
@@ -90,7 +96,8 @@ class ImportAnyModel(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                      '\n- MMD: .pmx/.pmd' \
                      '\n- XNALara: .xps/.mesh/.ascii' \
                      '\n- Source: .smd/.qc/.vta/.dmx' \
-                     '\n- FBX .fbx'
+                     '\n- FBX .fbx' \
+                     '\n- VRM .vrm/.glb/.gltm'
     # '\n- DAE .dae'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
@@ -99,12 +106,12 @@ class ImportAnyModel(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
 
     if bpy.app.version < (2, 79, 9):
         filter_glob = bpy.props.StringProperty(
-            default="*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.vta;*.dmx;*.fbx",
+            default="*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.vta;*.dmx;*.fbx;*.vrm;*.glb;*.gltm",
             options={'HIDDEN'}
         )
     else:
         filter_glob = bpy.props.StringProperty(
-            default="*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.vta;*.dmx;*.fbx;*.dae",
+            default="*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.vta;*.dmx;*.fbx;*.dae;*.vrm;*.glb;*.gltm",
             options={'HIDDEN'}
         )
     text1 = bpy.props.BoolProperty(
@@ -176,6 +183,10 @@ class ImportAnyModel(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                                               auto_connect=True)
                 except (TypeError, ValueError):
                     bpy.ops.wm.collada_import('INVOKE_DEFAULT')
+            
+            elif file_ending == 'vrm' or file_ending == 'glb' or file_ending == 'gltm':
+                print("FUCK")
+                bpy.ops.import_scene.gltf('INVOKE_DEFAULT', filepath=filepath)
 
         return {'FINISHED'}
 
@@ -190,7 +201,7 @@ class ModelsPopup(bpy.types.Operator):
 
     def invoke(self, context, event):
         dpi_value = bpy.context.user_preferences.system.dpi
-        return context.window_manager.invoke_props_dialog(self, width=dpi_value * 3, height=-550)
+        return context.window_manager.invoke_props_dialog(self, width=dpi_value * 4, height=-350)
 
     def check(self, context):
         # Important for changing options
@@ -208,6 +219,10 @@ class ModelsPopup(bpy.types.Operator):
         row.scale_y = 1.3
         row.operator('importer.import_source')
         row.operator('importer.import_fbx')
+        row = col.row(align=True)
+        row.scale_y = 1.3
+        row.operator('importer.import_vrm')
+
 
 
 class ImportMMD(bpy.types.Operator):
@@ -280,6 +295,17 @@ class ImportFBX(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class ImportVRM(bpy.types.Operator):
+    bl_idname = 'importer.import_vrm'
+    bl_label = 'VRM'
+    bl_description = 'Import a VRM model (.vrm/.glb/.gltm)'
+    bl_options = {'INTERNAL'}
+
+    def execute(self, context):
+        tools.common.remove_unused_objects()
+        bpy.ops.import_scene.gltm('INVOKE_DEFAULT')
+
+        return {'FINISHED'}
 
 class InstallXPS(bpy.types.Operator):
     bl_idname = "install.xps"

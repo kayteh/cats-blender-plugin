@@ -66,6 +66,36 @@ class FixArmature(bpy.types.Operator):
         return True
 
     def execute(self, context):
+        armature = tools.common.set_default_stage()
+
+        # VRM mesh fixes need to be done early
+        self.report({'INFO'}, 'checking for VRM for early fixes')
+        vrm_root = False
+        try:
+            arm_items = armature.pose.bones.items()
+            if arm_items[0][0] == 'Root' and arm_items[1][0] == 'Global' and arm_items[2][0] == 'Position':
+                vrm_root = arm_items[0][1]
+                self.report({'INFO'}, 'VRM check passed, fixing model.')
+            else:
+                self.report({'INFO'}, 'VRM check failed')
+        except AttributeError as e:
+            self.report({'WARNING'}, 'VRM check failed w/ error', e)
+
+        if vrm_root != False:
+            meshes = tools.common.get_meshes_objects(mode=2)
+        
+            for mesh in meshes:
+                if mesh.name == 'Body' or mesh.name == 'Face' or mesh.name.startswith('Hair'):
+                    # Move these meshes under the armature, possibly others.
+                    mesh.parent = armature
+        
+            for obj in bpy.data.objects:
+                if obj.name == 'Hairs' or obj.name == 'secondary':
+                    tools.common.delete_hierarchy(obj)
+        
+            self.report({'INFO'}, 'Performed VRM early fixes, moved body, face, and hair meshes under armature, deleted ephemeral transforms.')
+        
+
         if len(tools.common.get_meshes_objects()) == 0:
             self.report({'ERROR'}, 'No mesh inside the armature found!')
             return {'CANCELLED'}
@@ -73,10 +103,10 @@ class FixArmature(bpy.types.Operator):
         print('\nFixing Model:\n')
 
         wm = bpy.context.window_manager
-        armature = tools.common.set_default_stage()
 
         # Check if bone matrix == world matrix, important for xps models
         x_cord, y_cord, z_cord, fbx = tools.common.get_bone_orientations()
+
 
         # Add rename bones to reweight bones
         temp_rename_bones = copy.deepcopy(Bones.bone_rename)
