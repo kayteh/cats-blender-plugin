@@ -185,7 +185,6 @@ class ImportAnyModel(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
                     bpy.ops.wm.collada_import('INVOKE_DEFAULT')
             
             elif file_ending == 'vrm' or file_ending == 'glb' or file_ending == 'gltm':
-                print("FUCK")
                 bpy.ops.import_scene.gltf('INVOKE_DEFAULT', filepath=filepath)
 
         return {'FINISHED'}
