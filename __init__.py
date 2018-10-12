@@ -1993,6 +1993,8 @@ def register():
         print('Error while registering updater.')
         pass
 
+    gltf_local.register()
+
     for value in classesToRegister:
         bpy.utils.register_class(value)
 
@@ -2027,6 +2029,8 @@ def unregister():
         mmd_tools_local.unregister()
     except AttributeError:
         pass
+    
+    gltf_local.unregister()
 
     for value in reversed(classesToRegister):
         bpy.utils.unregister_class(value)
