@@ -30,10 +30,9 @@ def create_mesh(op, idx):
 
     # Add in all the primitives
     for i, primitive in enumerate(mesh['primitives']):
-        material = op.get('material', primitive.get('material', 'default_material'))
-        material_idx = materials.index(material)
+        material = op.get('material', primitive['material'])
 
-        add_in_primitive(op, bme, primitive, material_idx)
+        add_in_primitive(op, bme, primitive, bpy.data.materials.values().index(material))
 
 
     name = mesh.get('name', 'meshes[%d]' % idx)

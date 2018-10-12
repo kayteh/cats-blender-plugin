@@ -2,11 +2,27 @@ import base64
 import os
 import tempfile
 import math
+import warnings
+import functools
 
 import bpy
 from bpy_extras.image_utils import load_image
 from mathutils import Vector
 
+
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used."""
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+        warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)  # reset filter
+        return func(*args, **kwargs)
+    return new_func
 
 def create_image(op, idx):
     image = op.gltf['images'][idx]
@@ -34,11 +50,11 @@ def create_image(op, idx):
         # from memory. We'll write it to a temp file and load it from there.
         # Yes, this is a hack :)
         with tempfile.TemporaryDirectory() as tmpdir:
-            img_path = os.path.join(tmpdir, 'image_%d' % idx)
+            img_path = os.path.join(tmpdir, 'image_%d.png' % idx)
             with open(img_path, 'wb') as f:
                 f.write(buffer)
             img = load_image(img_path)
-            img.pack()  # TODO: should we use as_png?
+            img.pack(as_png=True)  # TODO: should we use as_png?
 
     img.name = image.get('name', 'images[%d]' % idx)
 
@@ -46,23 +62,37 @@ def create_image(op, idx):
 
     return img
 
-
 def create_material(op, idx):
     """Create a Blender material for the glTF materials[idx]. If idx is the
     special value 'default_material', create a Blender material for the default
     glTF material instead.
     """
-    use_color0 = idx in op.materials_using_color0
-
-    if idx == 'default_material':
-        return create_material_from_properties(op, {}, 'gltf Default Material', use_color0)
+    # use_color0 = idx in op.materials_using_color0
 
     material = op.gltf['materials'][idx]
     material_name = material.get('name', 'materials[%d]' % idx)
-    return create_material_from_properties(op, material, material_name, use_color0)
 
+    mat = bpy.data.materials.new(material_name)
+
+    pbr = material['pbrMetallicRoughness']
+    tex_idx = pbr['baseColorTexture']['index']
+    mat_color = pbr['baseColorFactor']
+
+    img = op.get('image', tex_idx)
+    tex = bpy.data.textures.new(img.get('name', material_name), 'IMAGE')
+    tex.image = img
+    slot = mat.texture_slots.add()
+    slot.texture = tex
+    mat.diffuse_color = mat_color[:3]
+    mat.alpha = mat_color[3]
+
+    # op.report({'INFO'}, 'tex name %s (%s) for mat %s' % (img.get('name', img_name), img_name, material_name))
+
+    return mat
 
 def create_material_from_properties(op, material, material_name, use_color0):
+    """Old function for glTF cycles, we're not using it."""
+    op.report({'WARNING'}, 'deprecated call to create_material_from_properties')
     mat = bpy.data.materials.new(material_name)
     mat.use_nodes = True
     tree = mat.node_tree
