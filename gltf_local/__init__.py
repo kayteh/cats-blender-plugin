@@ -132,10 +132,10 @@ class ImportGLTF(bpy.types.Operator, ImportHelper):
         self.check_required_extensions()
         self.config_vrm()
 
-        material.compute_materials_using_color0(self)
-        scene.create_scenes(self)
+        gltf_local.material.compute_materials_using_color0(self)
+        gltf_local.scene.create_scenes(self)
         if self.import_animations:
-            animation.add_animations(self)
+            gltf_local.animation.add_animations(self)
 
         return {'FINISHED'}
 
